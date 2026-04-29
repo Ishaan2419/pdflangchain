@@ -4,6 +4,7 @@ streamlit
 requests
 pydantic
 
+
 langchain==0.2.16
 langchain-community==0.2.16
 langchain-core==0.2.38
@@ -16,4 +17,4 @@ sentence-transformers
 
 PyPDF2
 
-protobuf==4.25.3
+protobuf==3.20.3
