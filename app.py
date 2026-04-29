@@ -1,9 +1,8 @@
 import streamlit as st
-import requests
 import tempfile
 import uuid
 
-from service import create_db_from_uploaded
+from service import create_db_from_uploaded, ask_question
 
 st.set_page_config(page_title="Chat with PDFs")
 st.header("📄 Chat with Multiple PDFs")
@@ -59,15 +58,11 @@ if user_question := st.chat_input("Ask a question"):
     with st.chat_message("user"):
         st.markdown(user_question)
 
-    response = requests.post(
-        "http://127.0.0.1:8000/chat",
-        json={
-            "session_id": session_id,
-            "query": user_question
-        }
-    )
-
-    answer = response.json()["Answer"]
+    # ✅ FIX: direct call instead of API
+    try:
+        answer = ask_question(session_id, user_question)
+    except Exception as e:
+        answer = f"Error: {str(e)}"
 
     st.session_state.messages.append({"role": "assistant", "content": answer})
     with st.chat_message("assistant"):
