@@ -1,8 +1,6 @@
-
 import os
 
 from langchain_ollama import ChatOllama
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
@@ -11,8 +9,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.documents import Document
+
 from PyPDF2 import PdfReader
-import shutil
 
 
 # -------------------------------
@@ -99,7 +97,7 @@ def load_db():
 
 
 # -------------------------------
-# init db (NO default PDFs)
+# init db
 # -------------------------------
 def init_db():
     if os.path.exists("cc"):
@@ -169,9 +167,12 @@ def ask_question(session_id, query):
     if any(word in query.lower() for word in history_keywords):
         context = ""
     else:
-        retriever = db.as_retriever()
-        docs = retriever.invoke(query)
-        context = "\n\n".join(d.page_content for d in docs)
+        if db is None:
+            context = ""
+        else:
+            retriever = db.as_retriever()
+            docs = retriever.invoke(query)
+            context = "\n\n".join(d.page_content for d in docs)
 
     response = chat.invoke(
         {
