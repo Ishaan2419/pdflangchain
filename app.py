@@ -1,17 +1,15 @@
 import streamlit as st
+import requests
 import tempfile
 import uuid
 
-from service import create_db_from_uploaded, ask_question
+from service import create_db_from_uploaded
 
-# -------------------------------
-# UI
-# -------------------------------
 st.set_page_config(page_title="Chat with PDFs")
 st.header("📄 Chat with Multiple PDFs")
 
 # -------------------------------
-# Session
+# session
 # -------------------------------
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -22,7 +20,7 @@ if "messages" not in st.session_state:
 session_id = st.session_state.session_id
 
 # -------------------------------
-# Sidebar
+# sidebar
 # -------------------------------
 with st.sidebar:
     st.subheader("Upload PDFs")
@@ -46,29 +44,31 @@ with st.sidebar:
             st.success("Done")
 
 # -------------------------------
-# Chat history
+# chat history
 # -------------------------------
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
 # -------------------------------
-# Chat input
+# chat input
 # -------------------------------
 if user_question := st.chat_input("Ask a question"):
 
-    # user message
     st.session_state.messages.append({"role": "user", "content": user_question})
     with st.chat_message("user"):
         st.markdown(user_question)
 
-    # 🔥 FIX: direct call instead of API
-    try:
-        answer = ask_question(session_id, user_question)
-    except Exception as e:
-        answer = f"Error: {str(e)}"
+    response = requests.post(
+        "http://127.0.0.1:8000/chat",
+        json={
+            "session_id": session_id,
+            "query": user_question
+        }
+    )
 
-    # assistant message
+    answer = response.json()["Answer"]
+
     st.session_state.messages.append({"role": "assistant", "content": answer})
     with st.chat_message("assistant"):
         st.markdown(answer)
