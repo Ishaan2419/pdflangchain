@@ -112,7 +112,7 @@ db = init_db()
 # -------------------------------
 # LLM
 # -------------------------------
-llm = ChatOllama(model="phi:mini")
+llm = ChatOllama(model="tinyllama")
 
 
 # -------------------------------
