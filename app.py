@@ -58,7 +58,7 @@ if user_question := st.chat_input("Ask a question"):
     with st.chat_message("user"):
         st.markdown(user_question)
 
-    # ✅ FIX: direct call instead of API
+    # 🔥 FIX: removed backend call
     try:
         answer = ask_question(session_id, user_question)
     except Exception as e:
